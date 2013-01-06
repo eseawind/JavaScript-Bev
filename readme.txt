@@ -16,3 +16,4 @@ SuperMap iClient JavaScript Bev 0.1.0 ×ÔÊö
     µç»°£º+86-028-67077006
 
     ÍøÖ·£ºhttp://www.supermap.com.cn
+![msysgit](http://f.cl.ly/items/2V2O3i1p3R2F1r2v0a12/mysgit.png)
