@@ -42,15 +42,23 @@
              *  myDrawFeature = new SuperMap.Bev.DrawFeature($(DivId),map);
              * (end)
              */
-            "init":function (body, map) {
-                if (!map || !body) {
-                    return;
-                }
-                this.body = body;
-                this.map = map;
-                this.map.addLayer(this.drFeVector_bev);
+            init:function (body, map) {
+                if(body)this.body = body;
+                this.setMap(map);
                 this.create();
-                this.createControl();
+                //this.createControl();
+            },
+
+            /**
+             * APIMethod: setMap
+             * 设置map参数
+             */
+            setMap:function(map){
+                if(map){
+                    this.map = map;
+                    this.map.addLayer(this.drFeVector_bev);
+                    this.createControl();
+                }
             },
 
             /**

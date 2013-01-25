@@ -40,7 +40,7 @@
              * (end)
              */
             "init":function (body, map) {
-                this.body = body;
+                if(body)this.body = body;
                 this.map = map;
 
                 this.create();
@@ -52,22 +52,23 @@
              */
             create:function () {
                 var d1, d2, d3, me = this;
-
-                this.resultDiv = d1 = $("<p class='measureResult'></p>").appendTo(this.body);
-                d2 = $("<button>长度量算</button>").button({
-                    icons:{
-                        primary:"ui-icon-locked"
-                    }
-                }).click(function () {
-                        me.measureDistance();
-                    }).appendTo(this.body);
-                d3 = $("<button>面积量算</button>").button({
-                    icons:{
-                        primary:"ui-icon-locked"
-                    }
-                }).click(function () {
-                        me.measureArea();
-                    }).appendTo(this.body);
+                if(this.body){
+                    this.resultDiv = d1 = $("<p class='measureResult'></p>").appendTo(this.body);
+                    d2 = $("<button>长度量算</button>").button({
+                        icons:{
+                            primary:"ui-icon-locked"
+                        }
+                    }).click(function () {
+                            me.measureDistance();
+                        }).appendTo(this.body);
+                    d3 = $("<button>面积量算</button>").button({
+                        icons:{
+                            primary:"ui-icon-locked"
+                        }
+                    }).click(function () {
+                            me.measureArea();
+                        }).appendTo(this.body);
+                }
             },
             /**
              * APIMethod: createControl
@@ -147,9 +148,9 @@
             measureDistance:function () {
                 if (this.measureControls["polygon"].active) {
                     this.measureControls["polygon"].deactivate();
-                    this.resultDiv.html("");
                 }
                 this.measureControls["line"].activate();
+                this.clearResult();
             },
             /**
              * APIMethod: measureArea
@@ -158,9 +159,9 @@
             measureArea:function () {
                 if (this.measureControls["line"].active) {
                     this.measureControls["line"].deactivate();
-                    this.resultDiv.html("");
                 }
                 this.measureControls["polygon"].activate();
+                this.clearResult();
             },
             /**
              * APIMethod: measureCompleted
@@ -172,11 +173,17 @@
                 var order = event.order;
                 var measure = event.measure;
                 if (order == 1) {
-                    this.resultDiv.html("长度：" + measure.toFixed(3) + units);
+                    this.showResult("长度：" + measure.toFixed(3) + units);
                 } else {
-                    this.resultDiv.html("面积：" + measure.toFixed(3) + units);
+                    this.showResult("面积：" + measure.toFixed(3) + units);
                 }
                 this.deactivate();
+            },
+            clearResult:function(){
+                if(this.resultDiv)this.resultDiv.html("");
+            },
+            showResult:function(txt){
+                if(this.resultDiv)this.resultDiv.html(txt);
             },
             /**
              * APIMethod: clearFeatures
@@ -185,7 +192,7 @@
             clearFeatures:function () {
                 try {
                     this.deactivate();
-                    this.resultDiv.html("");
+                    this.clearResult();
                 }
                 catch (e) {
                 }

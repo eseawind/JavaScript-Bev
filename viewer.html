@@ -75,15 +75,15 @@
             slideShow.bind('showNext', function () {
                 $('li:first').fadeOut('fast', function () {
                     $(this).remove().appendTo(ul).show();
-                    base = $(this).attr("alt");
                     updateZindex();
+                    base = $('li:first').attr("alt");
                 });
             });
 
             slideShow.bind('showPrevious', function () {
                 var liLast = $('li:last').hide().remove().prependTo(ul);
-                base = $('li:last').attr("alt");
                 updateZindex();
+                base = $('li:first').attr("alt");
                 liLast.fadeIn('fast');
             });
 
@@ -155,7 +155,10 @@
                     <!--<li alt="base4"><img src="./images/visual/base2.png" width="100%" /><SPAN class="describe" >模版三：全屏布局</SPAN></li>-->
                     <!--<li alt="base1"><img src="./images/visual/base3.png" width="100%"  /><SPAN class="describe" >模版四：扩展布局</SPAN></li>-->
                     <li alt="base1"><img src="./images/visual/base.png" width="100%"/><SPAN
-                            class="describe">模版一：基本布局</SPAN>
+                            class="describe">模版一：窗口操作界面</SPAN>
+                    </li>
+                    <li alt="base2"><img src="./images/visual/base2.png" width="100%"/><SPAN
+                            class="describe">模版二：左侧操作区</SPAN>
                     </li>
                 </ul>
             </div>
@@ -267,7 +270,7 @@
                 <option id="lytpop2" value='google'>Google Maps</option>
                 <option value='osm'>OpenStreet</option>
                 <option value='tdtlayer'>天地图</option>
-                <option value='wms'>WMS</option>
+                <!--<option value='wms'>WMS</option>-->
                 <option value='arcgis'>ArcGIS online</option>
                 <option value='baidu'>百度地图</option>
                 <option value='bing'>bing地图</option>

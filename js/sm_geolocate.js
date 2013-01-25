@@ -42,8 +42,8 @@
              *  myGeolocate = new SuperMap.Bev.Geolocate($(DivId),map);
              * (end)
              */
-            "init":function (body, map) {
-                if (!map || !body) {
+            init:function (body, map) {
+                if (!map) {
                     return;
                 }
                 this.body = body;
@@ -60,20 +60,22 @@
              */
             create:function () {
                 var me = this;
-                $("<button>地理定位</button>").button({
-                    icons:{
-                        primary:"ui-icon-locked"
-                    }
-                }).click(function () {
-                        me.geolocateMe();
-                    }).appendTo(this.body);
-                $("<button>清除标记</button>").button({
-                    icons:{
-                        primary:"ui-icon-locked"
-                    }
-                }).click(function () {
-                        me.clearGeoMarkers();
-                    }).appendTo(this.body);
+                if(this.body){
+                    $("<button>地理定位</button>").button({
+                        icons:{
+                            primary:"ui-icon-locked"
+                        }
+                    }).click(function () {
+                            me.geolocateMe();
+                        }).appendTo(this.body);
+                    $("<button>清除标记</button>").button({
+                        icons:{
+                            primary:"ui-icon-locked"
+                        }
+                    }).click(function () {
+                            me.clearGeoMarkers();
+                        }).appendTo(this.body);
+                }
             },
 
             /**

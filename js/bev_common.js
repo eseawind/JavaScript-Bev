@@ -242,11 +242,14 @@ function generate_custom() {
 
     var strTitle = document.getElementById("title").value;
     var strBase;
-
+    var name = null;
     if (base == "base1") {
-        base = "base";
+        name = "base";
     }
-    strBase = "<template src=\"./base/" + base + ".html\" />";
+    else{
+        name = base;
+    }
+    strBase = "<template name=\""+base+"\" src=\"./base/" + name + ".html\" />";
     var strservertype = document.getElementById("servertype").value;
     var strServerXML = "<server_use>Tomcat</server_use>";
     if (strservertype == "Tomcat") {
@@ -282,27 +285,345 @@ function generate_custom() {
         catch (e) {
         }
     }
-    generate_xml(xmlDoc);
+    var node = $(xmlDoc).find("template");
+    var name = node.attr('name');
+    var index = name.replace(/base([0-9]+)/,"$1");
+    eval("generate_xml_"+index+"(xmlDoc)");
 }
 
-function generate_xml(xml) {
-//    console.log(xml);
-//    return;
+function generate_xml_1(xml) {
     var strControls = [];
     var strBaseLayers = [];
     var strPanelsJS = [];
-    var strControlsMessage = "{ controls: [ ";
+    var strControlsMessage = "";
     var strMap;
     var strPosition;
     var strUrl;
     var strInsertscripts = "";
+
+    //读取并添加控件 strControls
+    strMap = getControlsStr(xml,strControls,strControlsMessage,strMap,16);
+
+    //读取并添加图层 strBaseLayers
+    var nCloudNumber = [];
+    var strIServerLayer = [];
+    var strInsertscript = [];
+    getLayersStr(xml,strBaseLayers,nCloudNumber,strIServerLayer,strInsertscript);
+
+    //读取并设置map的中心点和缩放级别
+    strPosition = getCenterStr(xml,strPosition);
+
+    //初始化地图方法的字符串拼接
+    var strInitFun = getBanks(8)+"function init() {\n"+getBanks(12)+"SuperMap.Bev.Main.init(function(){\n"+getBanks(16)+"SuperMap.Bev.Theme.set('" + skinTypeName + "');\n"+getBanks(16)+"initDemo();" + strMap;
+
+    for (var i = 0; i < strIServerLayer.length; i++) {
+        strInitFun = strInitFun + getBanks(16)+strBaseLayers[strIServerLayer[i]] + "\n";
+        strInitFun = strInitFun + getBanks(16)+"layer" + strIServerLayer[i] + ".events.on({ 'layerInitialized': addLayer });\n";
+    }
+    for (var i = 0; i < nCloudNumber.length; i++) {
+        strInitFun = strInitFun + getBanks(16)+strBaseLayers[nCloudNumber[i]] + "\n";
+        strInitFun = strInitFun + getBanks(16)+"map.addLayer(layer" + nCloudNumber[i] + ");\n";
+    }
+    for (var i = 0, length = strInsertscript.length; i < length; i++) {
+        strInsertscripts += strInsertscript[i];
+    }
+    if (strIServerLayer.length == 0) {
+        strInitFun = strInitFun + getBanks(16)+"map.setCenter(" + strPosition + "); \n";
+    }
+    strInitFun = strInitFun + getBanks(12)+"})\n"+getBanks(8)+"}\n";
+
+    //用来定义一些变量的
+    var strVar = getBanks(8)+"var map";
+    for (var i = 0; i < strBaseLayers.length; i++) {
+        strVar = strVar + ", " + "layer" + i;
+    }
+    strVar = strVar + ";\n";
+    if (strUrl != "" && strUrl != null && strUrl != undefined) {
+        if (strUrl.length != 0) {
+            strVar = strVar + "var url = " + "\"" + strUrl + "\"" + ";\n"
+        }
+    }
+    strInitFun = strVar + strInitFun;
+
+    //添加图层函数的字符串
+    var strLayer = "";
+    var strAddLayerFun = "";
+    if (strIServerLayer.length > 0) {
+        strLayer = "map.addLayer(layer" + strIServerLayer[0] + ");\n";
+        strAddLayerFun = " function addLayer() { \n" + strLayer + "\n map.setCenter(" + strPosition + "); \n}\n";
+    }
+
+    var objWidgets = {};
+    $(xml).find("panelmanager").children().each(function (i) {
+        //获取功能
+        var strConfig = $(this).attr('id');
+        var strUrl1 = "./models/demo1/" + strConfig + ".txt";
+        $.ajax({
+            async:false,
+            url:strUrl1,
+            success:function (data) {
+                objWidgets[strConfig] = data;
+            }});
+    })
+
+    var strItem = "";
+    if (objWidgets) {
+        var itemArray = [];
+        for (var item in objWidgets) {
+            //strItem += objWidgets[item] + ",\n"
+            itemArray.push(objWidgets[item]);
+        }
+        //去掉最后一个逗号
+        //strItem = strItem.substr(0, strItem.length - 1);
+        strItem = itemArray.join(",\n")+"\n";
+    }
+
+    //添加控件代码字符串
+    var strDemoVar = getBanks(8)+"var myWidgetControl,myMenuPanel,myMeasure,myNavigation,myGeolocate,myDrawFeature;";
+    var strWidgetControl = getBanks(12)+'myWidgetControl = new SuperMap.Bev.WidgetControl("#widgetControl");';
+    var strMenuPanel = "\n"+getBanks(12)+'myMenuPanel = new SuperMap.Bev.MenuPanel($("#toolbar"),{\n'+getBanks(16)+'"tree":[\n'+getBanks(20)+'{\n'+getBanks(24)+'"icon":"tool_icon",\n'+getBanks(24)+'"title":"基本操作",\n'+getBanks(24)+'"menu":new SuperMap.Bev.Menu(null,{\n'+getBanks(28)+'"tree":[\n' + strItem + '\n'+getBanks(28)+']\n'+getBanks(24)+'})\n'+getBanks(20)+'}\n'+getBanks(16)+']\n'+getBanks(12)+'});';
+    var strInitDemoFun = strDemoVar + "\n"+getBanks(8)+"function initDemo(){\n" + strWidgetControl + strMenuPanel + "\n"+getBanks(8)+"}\n";
+    //这里是生成新页面的地方
+    var strTemplateFile = $(xml).find("template").attr("src");
+    $.get(strTemplateFile, null, function (data) {
+        data = unescape(data);
+        var strTitle = $(xml).find("title").text();
+        var str_page_name = $(xml).find("page_name").text();
+
+        var strResult = strInsertscripts + getBanks(4)+"<" + "script" + ">" + "\n" + strInitFun + strAddLayerFun + strInitDemoFun + "\n";
+        for (var j = 0; j < strPanelsJS.length; j++) {
+            strResult = strResult + strPanelsJS[j] + "\n";
+        }
+        strResult = strResult + getBanks(4)+"</script" + ">\n";
+        data = data.replace("<title></title>", "<title>" + strTitle + "</title>");
+
+        //data = data.split("</body>")[0] + "\n" + strResult + "</body>" + "\n" + "</html>";
+        data = data.replace(/{_initscript_}/,"\n"+strResult+"\n");
+
+        var str_server_use = $(xml).find("server_use").text();
+        var str_server = "jsp";
+        if (str_server_use === "IIS") {
+            str_server = "asp"
+        } else if (str_server_use === "Tomcat") {
+            str_server = "jsp";
+        }
+        else if (str_server_use === "php") {
+            str_server = "php";
+        }
+        $.post("./index." + str_server,
+            { text:unescape(data), page_name:str_page_name + ".html" },
+            function (value) {
+                window.location = "./" + str_page_name + ".html";
+            });
+    });
+}
+
+function generate_xml_2(xml) {
+    var strControls = [];
+    var strBaseLayers = [];
+    var strPanelsJS = [];
+    var strControlsMessage = "";
+    var strMap;
+    var strPosition;
+    var strUrl;
+    var strInsertscripts = "";
+
+    //var varstr = "var map{_varstr_};";
+
+    //读取并添加控件 strControls
+    strMap = getControlsStr(xml,strControls,strControlsMessage,strMap,16);
+
+    //读取并添加图层 strBaseLayers
+    var nCloudNumber = [];
+    var strIServerLayer = [];
+    var strInsertscript = [];
+    var layersCount = getLayersStr(xml,strBaseLayers,nCloudNumber,strIServerLayer,strInsertscript);
+//    var varLayerStrArr = [];
+//    for(var i=0;i<layersCount;i++){
+//        varLayerStrArr.push("layer"+i);
+//    }
+//    var varLayerStr = varLayerStrArr.join(",");
+//    varstr = ","+varstr.replace(/{_varstr_}/,varLayerStr+"{_varstr_}");
+
+    //读取并设置map的中心点和缩放级别
+    strPosition = getCenterStr(xml,strPosition);
+
+    //初始化地图方法的字符串拼接
+    var strInitFun = getBanks(8)+"function init() {\n"+getBanks(12)+"SuperMap.Bev.Main.init(function(){\n"+getBanks(16)+"SuperMap.Bev.Theme.set('" + skinTypeName + "');\n"+getBanks(16)+"initDemo();\n"+getBanks(16)+strMap;
+
+    for (var i = 0; i < strIServerLayer.length; i++) {
+        strInitFun = strInitFun +getBanks(16)+strBaseLayers[strIServerLayer[i]] + "\n";
+        strInitFun = strInitFun +getBanks(16)+"layer" + strIServerLayer[i] + ".events.on({ 'layerInitialized': addLayer });\n";
+    }
+    for (var i = 0; i < nCloudNumber.length; i++) {
+        strInitFun = strInitFun +getBanks(16)+strBaseLayers[nCloudNumber[i]] + "\n";
+        strInitFun = strInitFun +getBanks(16)+"map.addLayer(layer" + nCloudNumber[i] + ");\n";
+    }
+    for (var i = 0, length = strInsertscript.length; i < length; i++) {
+        strInsertscripts += strInsertscript[i];
+    }
+    if (strIServerLayer.length == 0) {
+        strInitFun = strInitFun + getBanks(16)+"map.setCenter(" + strPosition + "); \n";
+    }
+    strInitFun = strInitFun + getBanks(12)+"})\n"+getBanks(8)+"}\n";
+
+    //用来定义一些变量的
+    var strVar = "        var map";
+    for (var i = 0; i < strBaseLayers.length; i++) {
+        strVar = strVar + ", " + "layer" + i;
+    }
+    strVar = strVar + ";\n";
+    if (strUrl != "" && strUrl != null && strUrl != undefined) {
+        if (strUrl.length != 0) {
+            strVar = strVar + "var url = " + "\"" + strUrl + "\"" + ";\n"
+        }
+    }
+    strInitFun = strVar + strInitFun;
+
+    //添加图层函数的字符串
+    var strLayer = "";
+    var strAddLayerFun = "";
+    if (strIServerLayer.length > 0) {
+        strLayer = "map.addLayer(layer" + strIServerLayer[0] + ");\n";
+        strAddLayerFun = "function addLayer() { \n" + strLayer + "\n map.setCenter(" + strPosition + "); \n}\n";
+    }
+
+    var controlNames = [];
+    var objWidgets = {};
+
+    $.ajax({
+        async:false,
+        url:"./models/demo2/accordion.txt",
+        success:function (data) {
+            objWidgets["accordion"] = data;
+        }});
+
+    $(xml).find("panelmanager").children().each(function (i) {
+        //获取功能
+        var strConfig = $(this).attr('id');
+        controlNames.push(strConfig);
+        var urls = [];
+        if(strConfig=="measure"){
+            urls = [
+                {
+                    "name":"measureIcon",
+                    "url":"./models/demo2/measureIcon.txt"
+                },
+                {
+                    "name":"getMeasure",
+                    "url":"./models/demo2/getMeasure.txt"
+                },
+                {
+                    "name":"getTooltip",
+                    "url":"./models/demo2/getTooltip.txt"
+                }
+            ]
+        }
+        else if(strConfig=="geolocate"){
+            urls = [
+                {
+                    "name":"geoLocateIcon",
+                    "url":"./models/demo2/geoLocateIcon.txt"
+                },
+                {
+                    "name":"getGeolocate",
+                    "url":"./models/demo2/getGeolocate.txt"
+                }
+            ]
+        }
+        for(var j=0;j<urls.length;j++){
+            $.ajax({
+                async:false,
+                url:urls[j].url,
+                success:function (name) {
+                    return function(data){
+                        objWidgets[name] = data;
+                    }
+                }(urls[j].name)});
+        }
+    })
+
+//    var strItem = "";
+//    if (objWidgets) {
+//        for (var item in objWidgets) {
+//            strItem += objWidgets[item] + ","
+//        }
+//        //去掉最后一个逗号
+//        strItem = strItem.substr(0, strItem.length - 1);
+//    }
+
+    //添加控件代码字符串
+    var strDemoVar = getBanks(8)+"var myMeasure,myTooltip,myGeolocate,myDrawFeature;";
+    //var strWidgetControl = 'myWidgetControl = new SuperMap.Bev.WidgetControl("#widgetControl");';
+    //var strMenuPanel = 'myMenuPanel = new SuperMap.Bev.MenuPanel($("#toolbar"),{\n    "tree":[\n        {\n            "icon":"tool_icon",\n            "title":"基本操作",\n            "menu":new SuperMap.Bev.Menu(null,{\n               "tree":[' + strItem + ']\n})\n}\n]\n});';
+    //var initDemoStr = objWidgets["accordion"] + "\n";
+    var initDemoStr = "";
+    var otherFunctionStr = "";
+    for(var i=0;i<controlNames.length;i++){
+        if(controlNames[i]=="measure"){
+            initDemoStr += objWidgets["measureIcon"] + "\n";
+            otherFunctionStr += objWidgets["getMeasure"] + "\n";
+            otherFunctionStr += objWidgets["getTooltip"] + "\n";
+        }
+        else if(controlNames[i]=="geolocate"){
+            initDemoStr += objWidgets["geoLocateIcon"] + "\n";
+            otherFunctionStr += objWidgets["getGeolocate"] + "\n";
+        }
+        else if (controlNames[i]=="drawFeature"){
+            var drawFeatureCode = "\n"+getBanks(20)+"{\n"+getBanks(24)+"\"title\":\"绘制\",\n"+getBanks(24)+"\"body\":drawFeatureBody\n"+getBanks(20)+"},";
+            objWidgets["accordion"] = objWidgets["accordion"].replace(/{_firstAccordingItem_}/,drawFeatureCode);
+            objWidgets["accordion"] = "\n"+getBanks(12)+"myDrawFeature = new SuperMap.Bev.DrawFeature($(\"<div>\"));\n"+getBanks(12)+"var drawFeatureBody = myDrawFeature.body;\n"+getBanks(12)+"window.setTimeout(function(){myDrawFeature.setMap(map);},30);\n"+objWidgets["accordion"];
+        }
+    }
+    objWidgets["accordion"] = objWidgets["accordion"].replace(/{_firstAccordingItem_}/,"");
+    initDemoStr += objWidgets["accordion"] + "\n";
+    var strInitDemoFun = strDemoVar + "\n"+getBanks(8)+"function initDemo(){\n" + initDemoStr + "\n"+getBanks(12)+"SuperMap.Bev.DemoUtil.toolBarHideBtn($(\"#bd_left\"),$(\"#bd_right\"));\n"+getBanks(8)+"}\n";
+    //这里是生成新页面的地方
+    var strTemplateFile = $(xml).find("template").attr("src");
+    $.get(strTemplateFile, null, function (data) {
+        data = unescape(data);
+        var strTitle = $(xml).find("title").text();
+        var str_page_name = $(xml).find("page_name").text();
+
+        var strResult = strInsertscripts + "    <" + "script" + ">" + "\n" + strInitFun + strAddLayerFun + strInitDemoFun + "\n";
+        for (var j = 0; j < strPanelsJS.length; j++) {
+            strResult = strResult + strPanelsJS[j] + "\n";
+        }
+        strResult+=otherFunctionStr+"\n";
+        strResult = strResult + "    </script" + ">\n";
+        data = data.replace("<title></title>", "<title>" + strTitle + "</title>");
+
+        //data = data.split("</body>")[0] + "\n" + strResult + "</body>" + "\n" + "</html>";
+        data = data.replace(/{_initscript_}/,"\n"+strResult+"\n");
+
+        var str_server_use = $(xml).find("server_use").text();
+        var str_server = "jsp";
+        if (str_server_use === "IIS") {
+            str_server = "asp"
+        } else if (str_server_use === "Tomcat") {
+            str_server = "jsp";
+        }
+        else if (str_server_use === "php") {
+            str_server = "php";
+        }
+        $.post("./index." + str_server,
+            { text:unescape(data), page_name:str_page_name + ".html" },
+            function (value) {
+                window.location = "./" + str_page_name + ".html";
+            });
+    });
+}
+
+function getControlsStr(xml,strControls,strControlsMessage,strMap,bankNums){
+    strControlsMessage = "\n"+getBanks(bankNums+4)+"{\n"+getBanks(bankNums+8)+"controls:[\n";
+    if(!bankNums)bankNums = 0;
     //读取并添加控件 strControls
     $(xml).find("Controls").children().each(function (i) {
         if (this.nodeName == "Navigation") {
-            strControls[i] = "new SuperMap.Control." + "Navigation({ dragPanOptions: { enableKinetic: true } })";
+            strControls[i] = getBanks(bankNums+12)+"new SuperMap.Control." + "Navigation({ dragPanOptions: { enableKinetic: true } })";
         }
         else {
-            strControls[i] = "new SuperMap.Control." + this.nodeName + "()";
+            strControls[i] = getBanks(bankNums+12)+"new SuperMap.Control." + this.nodeName + "()";
         }
     });
 
@@ -314,15 +635,17 @@ function generate_xml(xml) {
             strControlsMessage = strControlsMessage + strControls[i] + ",\n";
         }
     }
-    strControlsMessage = strControlsMessage + " ], units: 'm',projection: 'EPSG:3857'}\n";
-    strMap = "map = new SuperMap.Map('mapContainer'," + strControlsMessage + ");\n";
+    strControlsMessage = strControlsMessage + "\n"+getBanks(bankNums+8)+"],\n"+getBanks(bankNums+8)+"units: 'm',\n"+getBanks(bankNums+8)+"projection: 'EPSG:3857'\n"+getBanks(bankNums+4)+"}";
+    strMap = "\n"+getBanks(bankNums)+"map = new SuperMap.Map(\n"+getBanks(bankNums+4)+"'mapContainer',"+ strControlsMessage + "\n"+getBanks(bankNums)+");\n";
 
-    //读取并添加图层 strBaseLayers
-    var nCloudNumber = [];
-    var strIServerLayer = [];
-    var strInsertscript = [];
+    return strMap;
+}
+
+function getLayersStr(xml,strBaseLayers,nCloudNumber,strIServerLayer,strInsertscript){
+    var layersCount = 0;
     $(xml).find("BaseLayers").children().each(function (i) {
-        var strType, strName;
+        layersCount = i;
+        var strType, strName,strUrl;
         strType = $(this).attr('type');
         if (strType == "cloud") {
             strBaseLayers[i] = " layer" + i + " = new SuperMap.Layer.CloudLayer();\n";
@@ -354,12 +677,12 @@ function generate_xml(xml) {
         } else if (strType == "wms") {
             strUrl = $(this).attr('url');
             strName = $(this).attr('name');
-            strBaseLayers[i] = "layer" + i + " = new SuperMap.Layer.WMS('" + strName + "'," + "url" + ", {layers: 'basic'});\n";
+            strBaseLayers[i] = "layer" + i + " = new SuperMap.Layer.WMS('" + strName + "',\"" + strUrl + "\", {layers: 'basic'});\n";
             nCloudNumber.push(i);
         } else if (strType == "arcgis") {
             strUrl = $(this).attr('url');
             strName = $(this).attr('name');
-            strBaseLayers[i] = "layer" + i + " = new SuperMap.Layer.ArcGIS93Rest('" + strName + "'," + "url );\n";
+            strBaseLayers[i] = "layer" + i + " = new SuperMap.Layer.ArcGIS93Rest('" + strName + "',\"" + strUrl+"\" );\n";
             nCloudNumber.push(i);
             strInsertscript.push("<script src='./js/layer/ArcGIS93Rest.js'>" + "</script" + ">\n");
         } else if (strType == "baidu") {
@@ -375,7 +698,10 @@ function generate_xml(xml) {
 
     });
 
-    //读取并设置map的中心点和缩放级别
+    return layersCount;
+}
+
+function getCenterStr(xml,strPosition){
     $(xml).find("map").each(function () {
         var strLL, strZoom;
         $.each(this.attributes, function (i, attrib) {
@@ -398,104 +724,13 @@ function generate_xml(xml) {
 
         strPosition = strLL + " , " + strZoom;
     });
+    return strPosition;
+}
 
-    //初始化地图方法的字符串拼接
-    var strInitFun = "function init() {\n SuperMap.Bev.Main.init(function(){\n    SuperMap.Bev.Theme.set('" + skinTypeName + "');\n    initDemo();" + strMap;
-
-    for (var i = 0; i < strIServerLayer.length; i++) {
-        strInitFun = strInitFun + strBaseLayers[strIServerLayer[i]] + "\n";
-        strInitFun = strInitFun + "layer" + strIServerLayer[i] + ".events.on({ 'layerInitialized': addLayer });\n";
+function getBanks(num){
+    var a = "";
+    for(var i=0;i<num;i++){
+        a+=" ";
     }
-    for (var i = 0; i < nCloudNumber.length; i++) {
-        strInitFun = strInitFun + strBaseLayers[nCloudNumber[i]] + "\n";
-        strInitFun = strInitFun + "map.addLayer(layer" + nCloudNumber[i] + ");\n";
-    }
-    for (var i = 0, length = strInsertscript.length; i < length; i++) {
-        strInsertscripts += strInsertscript[i];
-    }
-    if (strIServerLayer.length == 0) {
-        strInitFun = strInitFun + "map.setCenter(" + strPosition + "); \n";
-    }
-    strInitFun = strInitFun + "})\n    }";
-
-    //用来定义一些变量的
-    var strVar = "var map";
-    for (var i = 0; i < strBaseLayers.length; i++) {
-        strVar = strVar + ", " + "layer" + i;
-    }
-    strVar = strVar + ";\n";
-    if (strUrl != "" && strUrl != null && strUrl != undefined) {
-        if (strUrl.length != 0) {
-            strVar = strVar + "var url = " + "\"" + strUrl + "\"" + ";\n"
-        }
-    }
-    strInitFun = strVar + strInitFun;
-
-    //添加图层函数的字符串
-    var strLayer = "";
-    if (strIServerLayer.length > 0) {
-        strLayer = "map.addLayer(layer" + strIServerLayer[0] + ");\n";
-    }
-
-    var strAddLayerFun = " function addLayer() { \n" + strLayer + "\n map.setCenter(" + strPosition + "); \n}\n";
-
-    var objWidgets = {};
-    $(xml).find("panelmanager").children().each(function (i) {
-        //获取功能
-        var strConfig = $(this).attr('id');
-        var strUrl1 = "./models/" + strConfig + ".txt";
-        $.ajax({
-            async:false,
-            url:strUrl1,
-            success:function (data) {
-                objWidgets[strConfig] = data;
-            }});
-    })
-
-    var strItem = "";
-    if (objWidgets) {
-        for (var item in objWidgets) {
-            strItem += objWidgets[item] + ","
-        }
-        //去掉最后一个逗号
-        strItem = strItem.substr(0, strItem.length - 1);
-    }
-
-    //添加控件代码字符串
-    var strDemoVar = "var myWidgetControl,myMenuPanel,myMeasure,myNavigation,myGeolocate,myDrawFeature;";
-    var strWidgetControl = 'myWidgetControl = new SuperMap.Bev.WidgetControl("#widgetControl");';
-    var strMenuPanel = 'myMenuPanel = new SuperMap.Bev.MenuPanel($("#toolbar"),{\n    "tree":[\n        {\n            "icon":"tool_icon",\n            "title":"基本操作",\n            "menu":new SuperMap.Bev.Menu(null,{\n               "tree":[' + strItem + ']\n})\n}\n]\n});';
-    var strInitDemoFun = strDemoVar + "\n function initDemo(){\n" + strWidgetControl + strMenuPanel + "\n}\n";
-    //这里是生成新页面的地方
-    var strTemplateFile = $(xml).find("template").attr("src");
-    $.get(strTemplateFile, null, function (data) {
-        data = unescape(data);
-        var strTitle = $(xml).find("title").text();
-        var str_page_name = $(xml).find("page_name").text();
-
-        var strResult = strInsertscripts + "<" + "script" + ">" + "\n" + strInitFun + strAddLayerFun + strInitDemoFun + "\n";
-        for (var j = 0; j < strPanelsJS.length; j++) {
-            strResult = strResult + strPanelsJS[j] + "\n";
-        }
-        strResult = strResult + "</script" + ">\n";
-        data = data.replace("<title></title>", "<title>" + strTitle + "</title>");
-
-        data = data.split("</body>")[0] + "\n" + strResult + "</body>" + "\n" + "</html>";
-
-        var str_server_use = $(xml).find("server_use").text();
-        var str_server = "jsp";
-        if (str_server_use === "IIS") {
-            str_server = "asp"
-        } else if (str_server_use === "Tomcat") {
-            str_server = "jsp";
-        }
-        else if (str_server_use === "php") {
-            str_server = "php";
-        }
-        $.post("./index." + str_server,
-            { text:unescape(data), page_name:str_page_name + ".html" },
-            function (value) {
-                window.location = "./" + str_page_name + ".html";
-            });
-    });
+    return a;
 }

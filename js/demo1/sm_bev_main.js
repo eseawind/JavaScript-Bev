@@ -467,7 +467,7 @@ LazyLoad = (function (doc) {
             "js/sm_geolocate.js",
             "js/sm_drawFeature.js"
         ]
-        this.themePath = jsPath+"sm_theme.js";
+        this.themePath = jsPath+"/demo1/sm_theme.js";
         this.loadTimes = 0;
         this.cache = {};
     }

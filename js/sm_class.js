@@ -28,7 +28,7 @@
 //    }
     A.create = function(className,object,extend,isTtatic,depend){
         var me=this;
-        if(depend){
+        if(depend&&depend.length>0){
                 SuperMap.Bev.Main.loadClass(className+"_depend",depend,function(className,object,extend,isTtatic,depend){
                     return function(){
                         _create(className,object,extend,isTtatic,depend);
