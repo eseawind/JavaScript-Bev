@@ -463,7 +463,16 @@
                                     primary:btn.button("option", "icons").primary == "ui-icon-circle-arrow-e" ? "ui-icon-circle-arrow-w" : "ui-icon-circle-arrow-e"
                                 },
                                 text:false
-                            })
+                            });
+                            if(me.isHide){
+                                me.setButtonDisable(me.scorllBottomBtn);
+                                me.setButtonDisable(me.scorllTopBtn);
+                            }
+                            else{
+                                me.setButtonEnable(me.scorllBottomBtn);
+                                me.setButtonEnable(me.scorllTopBtn);
+                                me.disableScorllWidgetBtn();
+                            }
                         });
                     }
                 }(this));
@@ -516,20 +525,24 @@
                 widgetList = this.widgetsContainer;
                 top = widgetList.position().top;
                 if (top >= this.top) {
-                    this.scorllTopBtn.button("option", "disabled", true);
-                    this.scorllTopBtn.button("option", "buttonElement").removeClass("ui-state-hover").removeClass("ui-state-focus");
+//                    this.scorllTopBtn.button("option", "disabled", true);
+//                    this.scorllTopBtn.button("option", "buttonElement").removeClass("ui-state-hover").removeClass("ui-state-focus");
+                    this.setButtonDisable(this.scorllTopBtn);
                 }
                 else {
-                    this.scorllTopBtn.button("option", "disabled", false);
+//                    this.scorllTopBtn.button("option", "disabled", false);
+                    this.setButtonEnable(this.scorllTopBtn);
                 }
                 height = widgetList.height();
                 allHeight = $(window).height();
                 if (top + height <= allHeight) {
-                    this.scorllBottomBtn.button("option", "disabled", true);
-                    this.scorllBottomBtn.button("option", "buttonElement").removeClass("ui-state-hover").removeClass("ui-state-focus");
+//                    this.scorllBottomBtn.button("option", "disabled", true);
+//                    this.scorllBottomBtn.button("option", "buttonElement").removeClass("ui-state-hover").removeClass("ui-state-focus");
+                      this.setButtonDisable(this.scorllBottomBtn);
                 }
                 else {
-                    this.scorllBottomBtn.button("option", "disabled", false);
+//                    this.scorllBottomBtn.button("option", "disabled", false);
+                    this.setButtonEnable(this.scorllBottomBtn);
                 }
             },
             /**
@@ -539,11 +552,13 @@
             disableHideWidgetsBtn:function () {
                 var btn = this.hideWidgetsBtn;
                 if (this.widgetsArray.length == 0) {
-                    btn.button("option", "disabled", true);
+                    //btn.button("option", "disabled", true);
+                    this.setButtonDisable(btn);
                     return true;
                 }
                 else {
-                    btn.button("option", "disabled", false);
+                    //btn.button("option", "disabled", false);
+                    this.setButtonEnable(btn);
                     return false;
                 }
             },
@@ -680,6 +695,27 @@
                         }
                     }
                 }(callback));
+            },
+            /**
+             * Method: setButtonDisable
+             * 设置按钮失效
+             *
+             * Parameters:
+             * btn {HTMLElement} 按钮对象
+             */
+            setButtonDisable:function(btn){
+                btn.button("option", "disabled", true);
+                btn.button("option", "buttonElement").removeClass("ui-state-hover").removeClass("ui-state-focus");
+            },
+            /**
+             * Method: setButtonEnable
+             * 设置按钮生效
+             *
+             * Parameters:
+             * btn {HTMLElement} 按钮对象
+             */
+            setButtonEnable:function(btn){
+                btn.button("option", "disabled", false);
             }
         },
         null,                              //父类
