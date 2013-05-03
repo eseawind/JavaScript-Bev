@@ -129,7 +129,8 @@ LazyLoad=function(k){function p(b,a){var g=k.createElement(b),c;for(c in a)a.has
             "demo/js/controls/sm_dialog.js",
             "demo/js/controls/sm_measure.js",
             "demo/js/controls/sm_geolocate.js",
-            "demo/js/controls/sm_drawFeature.js"
+            "demo/js/controls/sm_drawFeature.js",
+            "demo/js/controls/sm_util.js"
         ]
         /**
          * Property: themePath

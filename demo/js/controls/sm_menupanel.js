@@ -78,6 +78,7 @@
                 var tab = this.createTab();
                 tab.appendTo(this.body);
                 this.bindEvents();
+                $(window).resize();
             },
             /**
              * Method: createTab

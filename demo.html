@@ -73,14 +73,64 @@
         }
     </script>
 </head>
-<body onload="init()">
-<!--[if IE 7]><div style="position: absolute;width: 100%;height: 100%;overflow: hidden;"><![endif]-->
+<body onload="init()" style="position:absolute;width: 100%;height: 100%;overflow: hidden;">
+    <div id="bev_body" style="position: absolute;width: 100%;height: 100%;overflow: hidden;">
         <div id="mapContainer"></div><!--地图区域-->
         <div id="head" class="background_1"><!--标题栏-->
             <span id="logo" class="head_child"></span>
             <span id="toolbar" class="head_child"></span>
         </div>
         <div id="widgetControl"></div>
-<!--[if IE 7]></div><![endif]-->
+    </div>
 </body>
+<script type="text/javascript">
+    (function(){//控制页面的自适应浏览器窗口大小
+        var a = function(){
+            var toolbar = $("#toolbar");
+            var toolbarWidth = 0;
+            if(toolbar){
+                if(window.toolbarWidth){
+                    toolbarWidth = window.toolbarWidth;
+                }
+                else{
+                    toolbarWidth = SuperMap.Bev.Util.getSize(toolbar).w + 50;
+                }
+            }
+
+            var logo = $("#logo");
+            var logoWidth = 0;
+            if(logo){
+                if(window.logoWidth){
+                    logoWidth = window.logoWidth;
+                }
+                else{
+                    logoWidth = SuperMap.Bev.Util.getSize(logo).w + 10;
+                }
+            }
+
+            var width = toolbarWidth + logoWidth;
+
+            var b = document.body;
+            var clientWidth = b.clientWidth;
+            width += 10;
+            if(clientWidth<width){
+                $("#bev_body").css({
+                    "width":width+"px"
+                });
+                $("body").css({
+                    "overflow-x":"auto"
+                })
+            }
+            else{
+                $("#bev_body").css({
+                    "width":"100%"
+                });
+                $("body").css({
+                    "overflow-x":"hidden"
+                })
+            }
+        }
+        $(window).resize(a);
+    })();
+</script>
 </html>

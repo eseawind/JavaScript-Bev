@@ -28,6 +28,7 @@
         SuperMap.Bev.Main.load("css",path,function(){
             me.setStyle(themeName);
             me.setFontColor(themeName);
+            $(window).resize();
         },null);
     }
     /**
