@@ -1,7 +1,0 @@
-﻿        function getGeolocate(){
-            if(!myGeolocate){
-                myGeolocate = new SuperMap.Bev.Geolocate(null, map);
-            }
-
-            return myGeolocate;
-        }

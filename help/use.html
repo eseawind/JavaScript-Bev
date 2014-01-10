@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>使用帮助文档</title>
+    <link href='css/style.css' rel='stylesheet'/>
+</head>
+<body>
+   <div id="body">
+       <h1>SuperMap JavaScript Bev 使用帮助文档</h1>
+       <br>
+       <br>
+       <div id="content">
+           <h3>一、简介</h3>
+           <div class="images"><img src="images/brief.png"/></div>
+           <br>
+           <p>
+               SuperMap JavaScript Bev是基于SuperMap iClient for JavaScript产品的一个web地图框架，
+               致力于帮助用户快速开发出满足自己需要的地图应用。通过SuperMap JavaScript Bev，用户以可视化向导的方式，
+               生成支持多种地图服务的地图应用，该应用由一些静态页面构成，具有量算等基本功能。
+               大大降低了用户的开发难度和时间成本。
+           </p>
+           <h6>产品定位</h6>
+           <ul>
+               <li>快速搭建地图应用。</li>
+               <li>为中小项目提供基本的前端地图框架，降低项目的开发难度和时间成本。</li>
+           </ul>
+           <h6>产品特点</h6>
+           <ul>
+               <li>可视化向导，无编码的开发方式，简单易用。</li>
+               <li>多模板支持，满足用户对页面布局的不同需要，并可扩展。</li>
+               <li>多样的地图服务，目前支持iServer、SuperMap云地图、ArcGIS、百度、天地图等地图服务。</li>
+               <li>页面自适应，跨浏览器，兼容性强。</li>
+               <li>轻量级。</li>
+               <li>可扩展性。</li>
+               <li>产品开源，存放于<a href="https://github.com/SuperMap" target="_bank">Git库</a>中。</li>
+           </ul>
+           <h3>二、安装指南</h3>
+           <ul>
+               <li>下载<a href="https://github.com/SuperMap/JavaScript-Bev" target="_bank">SuperMapJavaScript Bev。</a></li>
+               <li>解压缩 zip 包并拷贝到发布目录，可以拷贝到iServer的webapps目录或tomcat的发布目录。</li>
+               <li>浏览器下访问bev根目录下的welcome.html</li>
+               <li>根据可视化向导完成整个地图页面的搭建。</li>
+           </ul>
+		   <h3>三、目录说明</h3>
+		   <div class="images"><img src="images/list.png"/></div>
+		   <ul>
+		      <li><strong>common</strong>
+			  <br>
+			  此文件夹下面存放的是这个项目公用的一些文件，比如说jquery.js</li>
+			  <li><strong>config</strong>
+			  <br>
+			  此文件夹下存放的是配置页面中的配置工具的源码，以及配置文件
+					<ul>
+				       <li><strong>config.json</strong>&nbsp;&nbsp;配置文件，用于定义配置工具中的配置选项</li>
+					</ul>
+			  </li>
+			  <li><strong>demo</strong>
+			  <br>
+			  此文件夹存放的是项目所用到的css文件、js文件，它包含六个文件夹，
+			  分别为：css、img、js、libs、theme和utthemes
+			      <ul>
+				       <li><strong>css</strong>&nbsp;&nbsp;项目的css样式文件</li>
+					   <li><strong>img</strong>&nbsp;&nbsp;存放图标文件</li>
+					   <li><strong>js</strong>&nbsp;&nbsp;包含bev控件js文件，jquery ui控件js文件等</li>
+					   <li><strong>libs</strong>&nbsp;&nbsp;存放的是iclient for javascript类库</li>
+					   <li><strong>theme</strong>&nbsp;&nbsp;存放的是iclient for javascript主题文件</li>
+					   <li><strong>uithemes</strong>&nbsp;&nbsp;存放的是jquery ui的主题文件</li>
+				  </ul>
+			  </li>
+			  <li><strong>help</strong>
+			  <br>
+			  此文件夹存放的是api文档、使用文档、开发文档和配置文档，以及文档相关的图片</li>
+			  <li><strong>licenses</strong>
+			  <br>
+			  此文件夹存放的是licenses文件</li>
+			  <li><strong>WEB-INF</strong>
+			  <br>
+			  此文件夹下为项目文件</li>
+			  <li><strong>config.jsp</strong>
+			  <br>
+			  这个是bev的配置页面</li>
+			  <li><strong>configWin.jsp</strong>
+			  <br>
+			  这个是要嵌入到配置页面里面去的模板文件页面</li>
+			  <li><strong>template1.html</strong>
+			  <br>
+			  配置模板一时所要引用的文件</li>
+			  <li><strong>template2.html</strong>
+			  <br>
+			  配置模板二时所要引用的文件</li>
+			  <li><strong>template3.html</strong>
+			  <br>
+			  配置模板三时所要引用的文件</li>
+			  <li><strong>welcome.html</strong>
+			  <br>
+			  bev的欢迎页面，在这里点击"请体验"按钮即可进入到配置页</li>
+		   </ul>
+           <h3>四、使用说明</h3>
+           <h6>1、欢迎页(welcome.html)</h6>
+           <div class="images"><img src="images/brief.png"/></div>
+           <br>
+           <h6>2、点击"请体验"按钮进入配置页</h6>
+           <div class="images"><img src="images/config.png"/></div>
+           <br>
+           <p>
+               配置页分为左右两侧，左侧为配置区域，右侧为地图浏览区域，当修改配置选项时，右侧地图会实时的更新。
+           </p>
+           <h6>3、选择模板和主题</h6>
+           <p>
+               配置面板的第一项为“选择模板”，目前我们提供了三个模板供用户选择。
+           </p>
+           <div class="images"><img src="images/selectTemplate.png"/></div>
+           <br>
+           <p>
+               配置面板的第二项为“选择主题”，目前我们提供了很多主题供用户选择，用户可以选择自己喜欢的主题。
+           </p>
+           <div class="images"><img src="images/selectTheme.png"/></div>
+           <br>
+           <h6>4、设置地图参数</h6>
+           <p>
+               配置面板的第三项为“设置地图参数”，这里我们可以设置项目的标题、地图服务、经度、纬度、级别以及地图控件。
+           </p>
+           <div class="images"><img src="images/mapParam.png"/></div>
+           <br>
+           <h6>5、选择功能控件</h6>
+           <p>
+               配置面板的最后一项为“选择功能控件”，这里我们可以选择添加一些功能。目前只提供了量算、定位、绘制等基本功能。
+           </p>
+           <div class="images"><img src="images/selectControl.png"/></div>
+           <br>
+           <h6>6、生成页面</h6>
+           <p>
+               以上参数都修改好以后，点击顶部的“生成页面”按钮，即可在bev的根目录下生成一个“index.html”文件，并将浏览器重定向到该页面。
+           </p>
+           <div class="images"><img src="images/newPage.png"/></div>
+           <br>
+       </div>
+   </div>
+</body>
+</html>

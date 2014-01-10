@@ -1,0 +1,243 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>配置工具扩展帮助</title>
+    <link href='css/style.css' rel='stylesheet'/>
+</head>
+<body>
+   <div id="body">
+       <h1>SuperMap JavaScript Bev 配置工具扩展帮助</h1>
+       <br>
+       <br>
+       <div id="content">
+           <h3>一、简述</h3>
+           <p>
+               SuperMap JavaScript Bev不仅提供了一个非常简单易用的地图配置页面，而且这个配置页面还是可以自定义的，
+               用户不仅可以删除左侧配置栏里的按钮选项，而且还可以添加一些自定义的选项，
+               本文档说明了如何自定义bev的配置界面。
+           </p>
+           <div class="images"><img src="images/config.png"/></div>
+           <br>
+           <h3>二、bev配置页面运行原理</h3>
+           <h6>1、大致运行流程</h6>
+           <ul>
+               <li>a、读取“config/config.json”中的配置信息：“config.json”中定义了配置页面的信息，说明了左侧配置工具栏的布局和和各配置工具的定义。</li>
+               <li>b、读取“template*.html”中html模板代码：根据“config.json”中定义的“选择模板”工具，读取相应的模板文件内容，默认读取“template1.html”。</li>
+               <li>c、根据“config.json”中的配置工具定义，生成配置页面的左侧工具栏列表。</li>
+               <li>d、生成html代码：根据“config.json”和“template1.html”内容，生成html代码，在“config.json”中每个工具都有“id”和“jscode”属性，在“template1.html”
+                   中，有类似“{_mapName_}”这样的关键词，生成html代码实际就是根据id将“template1.html”中的关键词替换为相应的jsCode。</li>
+               <li>e、将上一步生成的html代码，渲染到配置页面右侧的区域中。</li>
+               <li>f、当用户修改左侧配置区域的工具时，后台会根据修改的结果重新生成html代码，并在右侧区域渲染出来。</li>
+               <li>g、当用户点击顶部“生成页面>>”按钮时，bev会将当前的html代码写入到一个index.html页面中，该文件位于bev根目录下，该文件即最终生成的结果页面，用户可以
+                   直接使用该页面。</li>
+           </ul>
+           <h6>2、config.json</h6>
+           <p>
+               在jsbev的文件夹中存在一个“config.json”文件，该文件的位置位于“config/config.json”,主要用于存储配置页面的配置工具参数信息。
+           </p>
+           <p>
+               “config.json”的内容如下：
+           </p>
+           <pre>
+{
+    "configInfo":[
+        {
+            "category":"选择模板",
+            "contents":[...]
+        },
+        {
+            "category":"选择主题",
+            "contents":[...]
+        },
+        {
+            "category":"设置地图参数",
+            "contents":[...]
+        },
+        {
+            "category":"选择功能控件",
+            "contents":[...]
+        }
+    ]
+}
+           </pre>
+           <p>
+               其中“configInfo”数组对应着配置页面左侧的几个菜单选项，“category”为菜单项的标题，contents为其中的菜单内容。
+               下面我们以第四个菜单（“选择功能控件”）为例来详细讲解contents中的内容：
+           </p>
+           <pre>
+{
+    "configInfo":[
+        ...
+        {
+            "category":"选择功能控件",
+            "contents":[
+                {
+                    "type":"checkbox",
+                    "options":{
+                        "id":"measureControl",
+                        "title":"量算控件",
+                        "jsCode":"addMeasure($key);",
+                        "defaultValue":1
+                    }
+                },
+                {
+                    "type":"checkbox",
+                    "options":{...}
+                },
+                {
+                    "type":"checkbox",
+                    "options":{...}
+                }
+            ]
+        }
+    ]
+}
+           </pre>
+           <p>
+               这里“contents”数组中定义了三个控件，分别是“量算控件”、“定位控件”和“绘制控件”，
+               下面我们看一下量算控件的定义,该工具为一个单选框：
+           </p>
+           <pre>
+{
+    "type":"checkbox",                            //表示该配置工具为一个单选框
+    "options":{
+        "id":"measureControl",                    //该配置工具的id
+        "title":"量算控件",                       //该配置工具描述
+        "jsCode":"addMeasure($key);",             //该配置工具对应的js代码，该代码会被替换到模板中的相应位置，
+                                                  //其中的"$key"会被替换为工具的默认值（“defaultValue”）
+        "defaultValue":1                          //该配置工具的默认值，在这里“1”表示选中，“0”表示不选中
+    }
+},
+           </pre>
+           <p>其他类型工具的定义：</p>
+           <p>a、选择列表</p>
+           <pre>
+{
+    "type":"select",                                   //表示该工具为一个选择列表
+    "options":{
+        "id":"themeSelect",                            //该配置工具的id
+        "title":null,                                  //该配置工具描述
+        "jsCode":"Bev.Theme.set(\"$key\");",           //该配置工具对应的js代码，该代码会被替换到模板中的相应位置，
+                                                       //其中的"$key"会被替换为工具的默认值（“defaultValue”）
+        "defaultValue":"base",                         //该配置工具的默认值
+        "nameValues":[                                 //供选择的选项数组，当选中时，value会替换jsCode中“$key”
+            {
+                "name":"浅蓝色调",
+                "value":"cupertino"
+            },
+            {
+                "name":"经典",
+                "value":"base"
+            },
+            ...
+        ]
+    }
+}
+           </pre>
+           <p>b、文本输入框</p>
+           <pre>
+{
+    "type":"textArea",                                   //表示该工具为一个文本输入框
+    "options":{
+        "id":"mapName",                                  //该配置工具的id
+        "title":"地图名称:",                             //该配置工具描述
+        "jsCode":"$key",                                 //该配置工具对应的js代码，该代码会被替换到模板中的相应位置，
+                                                         //其中的"$key"会被替换为工具的默认值（“defaultValue”）
+        "defaultValue":"SuperMap"                        //该配置工具的默认值
+    }
+}
+           </pre>
+           <p>c、多项选择器</p>
+           <pre>
+{
+    "type":"checkboxList",                               //表示该工具为一个多项选择器
+    "options":{
+        "id":"mapControls",                              //该配置工具的id
+        "title":"选择地图控件:",                         //该配置工具描述
+        "jsonCode":"getMapControlList(\"$key\")",        //该配置工具对应的js代码，该代码会被替换到模板中的相应位置，
+                                                         //其中的"$key"会被替换为工具的默认值（“defaultValue”）
+        "defaultValue":"1,2,3,4",                        //该配置工具的默认值,这里传入的是逗号隔开的数字，数字表示各选项的序号，
+                                                         //这里表示1、2、3、4四个选项全选
+        "list":[                                         //供选择的选项列表
+            {
+                "title":"缩放控件",                      //选项的标题
+                "key":1                                  //选项的序号，序号不能重复
+            },
+            {
+                "title":"比例尺",
+                "key":2
+            },
+            {
+                "title":"导航控件",
+                "key":3
+            },
+            {
+                "title":"鹰眼",
+                "key":4
+            }
+        ]
+    }
+}
+           </pre>
+           <h6>3、template*.html</h6>
+           <p>
+               下面我们来讲一下模板文件，目前有三个模板文件分别对应配置工具中的三个模板选项。下图为模板文件的具体代码，
+               红框中的为配置工具id关键字，配置工具会将该id关键字替换为id对应工具的jsCode字符串。
+           </p>
+           <div class="images"><img src="images/template.png"/></div>
+           <h3>三、如何自定义配置工具</h3>
+           <h6>1、如何删除配置工具</h6>
+           <p>
+               删除现有配置工具非常简单，只需要在“config.json”中删除相应配置工具的定义即可。
+           </p>
+           <h6>1、如何增加配置工具</h6>
+           <p>
+               增加配置工具也很简单，首先需要在“config.json”中增加相应配置工具的定义，然后在三个模板文件（template*.html）中
+               增加该工具的id关键字。
+           </p>
+           <p>
+               下面教大家如何在bev中增加一个页脚，并且实现在配置工具中可以控制该页脚是否显示。
+           </p>
+           <p>首先，编写页脚的前端实现代码，并将该代码分别拷贝到三个模板文件(template1.html,template2.html,template3.html)的最后一个"&#60;/script&#62;"的前边，
+               并且增加id关键字，代码如下:</p>
+           <pre>
+{_setFooter_}
+function setFooter(isDisplay){
+    if(isDisplay==1){
+        $("&#60;a&#62;")
+            .css({
+                "position":"absolute",
+                "bottom":"5px",
+                "left":"100px"
+            })
+            .attr({
+                "href":"http://www.supermap.com.cn",
+                "target":"_blank"
+            })
+            .html("Powered By SuperMap")
+            .appendTo($("body"));
+    }
+}
+           </pre>
+           <p>
+               然后，在“config.json”中“选择功能控件”菜单的“contents”数组中增加该页脚配置工具的定义，增加后请记住给前一个元素后增加逗号，代码如下：
+           </p>
+           <pre>
+{
+    "type":"checkbox",
+    "options":{
+        "id":"setFooter",
+        "title":"添加页脚",
+        "jsCode":"setFooter($key);",
+        "defaultValue":1
+    }
+}
+           </pre>
+           <p>
+               重启tomcat或iServer，就能在配置页看到相应的效果了。
+           </p>
+           <div class="images"><img src="images/addConfigTool.png"/></div>
+       </div>
+   </div>
+</body>
+</html>

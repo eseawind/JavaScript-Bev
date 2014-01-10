@@ -1,0 +1,31 @@
+﻿.bev-logo{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: bold;
+    font-size: 36px;
+    font-style: italic;
+}
+.bev-banner{
+    color: #FFF;
+
+
+    background-color: #3071A9;
+
+    background-image: -webkit-linear-gradient(to bottom,#428BCA 0,#3071A9 100%);
+    background-image: linear-gradient(to bottom, #428BCA 0px, #3071A9 100%);
+    background-image:-webkin-gradient(linear,bottom,color-stop(0%,#428BCA),color-stop(100%,#3071A9));
+    background-image:-o-linear-gradient(to bottom,#428BCA 0,#3071A9 100%);
+    background-image:-ms-linear-gradient(to bottom,#428BCA 0,#3071A9 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#428BCA',endColorstr='#3071A9',GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+
+    border: 1px solid #DDDDDD;
+    border-color: #DDDDDD;
+
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15),0 1px 5px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15),0 1px 5px rgba(0, 0, 0, 0.075);
+}
+#canvas{
+    background: #f1f1f1;
+    box-shadow:0 0 20px #234878;
+    border: 7px solid #3071A9;
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="demo/css/demo1.css">
+    <script src="common/js/jquery.js"></script>
+    <script src="demo/js/bevInclude.js"></script><!--引入bev入口脚本-->
+    <script src="demo/libs/SuperMap.Include.js"></script><!--引入SuperMap iClient For JavaScript类库-->
+    <script src="demo/js/demo1.js"></script>
+    <style>
+        #mapContainer {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            /*z-index: -5;*/
+        }
+    </style>
+    <script>
+        var map, layer0;
+        function init() {
+            {_logoImageUpload_}
+            {_logoTitle_}
+            {_themeSelect_}
+            initDemo();
+            window.center = new SuperMap.LonLat({_longitude_},{_latitude_});
+            window.zoom = {_zoomLevel_};
+            window.mapControlList = {_mapControls_};
+            {_mapServiceSelect_}
+        }
+        var myWidgetControl,myNav,myMenu,myMeasure,myGeolocate,myDrawFeature;
+        function initDemo(){
+            myWidgetControl = new Bev.WidgetControl("#widgetControl");
+            myNav=new Bev.Navbar({
+                "body":$("#toolbar")
+            });
+            myMenu = new Bev.Menu({
+                "body":$("#toolbar")
+            });
+
+            {_measureControl_}
+            {_geolocateControl_}
+            {_drawControl_}
+
+            myNav.addNavItem({
+                "icon_class":"tool-icon-20",
+                "title":"基本操作"
+            });
+            myNav.bindEvent(0,{
+                "mouseover":function(){
+                    var position=$(this).position();
+                    myMenu.menuBody.css({"display":"block","position":"absolute","top":position.top+30}) ;
+                    myMenu.menuBody.mouseover(function(){
+                        myMenu.menuBody.css({"display":"block","position":"absolute","top":position.top+30}) ;
+                    });
+                },
+                "mouseout":function(){
+                    myMenu.menuBody.css({"display":"none"});
+                    myMenu.menuBody.mouseout(function(){
+                        myMenu.menuBody.css({"display":"none"});
+                    });
+                }
+            });
+        };
+
+        function setLogoImg(paraStr){
+            if(paraStr){
+                var tp = paraStr.split(",");
+                var isSelect = tp[0];
+                var imgSrc = tp[1];
+
+                if(isSelect=="1"){
+                    $("#logoImg").css({
+                        "display":"inline"
+                    })
+                    .attr({
+                        "src":"demo/img/"+imgSrc
+                    });
+                }
+                else{
+                    $("#logoImg").css({
+                        "display":"none"
+                    });
+                }
+            }
+        }
+
+        function setLogoTitle(paraStr){
+            if(paraStr){
+                var tp = paraStr.split(",");
+                var isSelect = tp[0];
+                var text = tp[1];
+
+                $("#logoTitle").html(text).css({
+                    "display":(isSelect=="1")?"inline":"none"
+                });
+                document.title = text;
+            }
+        }
+    </script>
+</head>
+<body onload="init()" style="position:absolute;width: 100%;height: 100%;overflow: hidden;">
+<div id="bev_body" style="position: absolute;width: 100%;height: 100%;overflow: hidden;">
+    <div id="mapContainer"></div><!--地图区域-->
+    <div id="head" class="background_1"><!--标题栏-->
+        <span id="logo" class="head_child bev-logo"><img id="logoImg" style="display: none;height:56px;"/><span id="logoTitle"></span></span>
+        <span id="toolbar" class="head_child"></span>
+    </div>
+    <div id="widgetControl"></div>
+</div>
+</body>
+<script type="text/javascript">
+    (function(){//控制页面的自适应浏览器窗口大小
+        var a = function(){
+            var toolbar = $("#toolbar");
+            var toolbarWidth = 0;
+            if(toolbar){
+                if(window.toolbarWidth){
+                    toolbarWidth = window.toolbarWidth;
+                }
+                else{
+                    toolbarWidth = Bev.Util.getSize(toolbar).w + 50;
+                }
+            }
+
+            var logo = $("#logo");
+            var logoWidth = 0;
+            if(logo){
+                if(window.logoWidth){
+                    logoWidth = window.logoWidth;
+                }
+                else{
+                    logoWidth = Bev.Util.getSize(logo).w + 10;
+                }
+            }
+
+            var width = toolbarWidth + logoWidth;
+
+            var b = document.body;
+            var clientWidth = b.clientWidth;
+            width += 10;
+            if(clientWidth<width){
+                $("#bev_body").css({
+                    "width":width+"px"
+                });
+                $("body").css({
+                    "overflow-x":"auto"
+                })
+            }
+            else{
+                $("#bev_body").css({
+                    "width":"100%"
+                });
+                $("body").css({
+                    "overflow-x":"hidden"
+                })
+            }
+        }
+        $(window).resize(a);
+    })();
+</script>
+</html>

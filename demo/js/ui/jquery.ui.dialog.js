@@ -134,10 +134,17 @@ $.widget("ui.dialog", {
 				})
 				.prependTo( uiDialog );
 
-			uiDialogTitlebarClose = $( "<a href='#'></a>" )
+			uiDialogTitlebarClose = $( "<button></button>" )
 				.addClass( "ui-dialog-titlebar-close  ui-corner-all" )
 				.attr( "role", "button" )
                 .attr("title","关闭")
+                .css({"height":"19px","width":"20px","vertical-align": "top","margin-top":"0px"})
+                .bevbutton({
+                    icons:{
+                        primary:"glyphicon-remove-circle"
+                    },
+                    text:false
+                })
 				.click(function( event ) {
 					event.preventDefault();
 					that.close( event );
@@ -148,10 +155,10 @@ $.widget("ui.dialog", {
                 .html(addtionbtncontent)
                 .appendTo(uiDialogTitlebar);
 
-			( this.uiDialogTitlebarCloseText = $( "<span>" ) )
-				.addClass( "ui-icon ui-icon-closethick" )
-				.text( options.closeText )
-				.appendTo( uiDialogTitlebarClose );
+			/*( this.uiDialogTitlebarCloseText = $( "<span>" ) )
+                .addClass( "glyphicon glyphicon-remove-circle" )
+                //.text( options.closeText )
+				.appendTo( uiDialogTitlebarClose );*/
 
 			uiDialogTitle = $( "<span>" )
 				.uniqueId()
@@ -330,6 +337,14 @@ $.widget("ui.dialog", {
 
 		return this;
 	},
+
+    hide:function(){
+        this.uiDialog.hide();
+    },
+
+    show:function(){
+        this.uiDialog.show();
+    },
 
 	open: function() {
 		if ( this._isOpen ) {

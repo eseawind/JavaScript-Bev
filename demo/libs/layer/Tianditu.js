@@ -85,7 +85,12 @@ SuperMap.Layer.Tianditu = SuperMap.Class(SuperMap.CanvasLayer, {
         var me = this;
         url = me.url;
 
-        if(this.projection=="EPSG:4326"){
+        var proj = this.projection;
+        if(proj.getCode){
+            proj = proj.getCode();
+        }
+
+        if(proj=="EPSG:4326"){
             var proj = "c"
         }
         else{
@@ -140,7 +145,7 @@ SuperMap.Layer.Tianditu = SuperMap.Class(SuperMap.CanvasLayer, {
                 proCode = proj;
             }
         }
-        this.setTiandituParam(proj);
+        this.setTiandituParam(proCode);
     },
 
     /**
@@ -185,7 +190,7 @@ SuperMap.Layer.Tianditu = SuperMap.Class(SuperMap.CanvasLayer, {
             }
 
             this.units = "degree";
-            this.projection = "EPSG:4326";
+            this.projection = new SuperMap.Projection("EPSG:4326");
 
             this.maxExtent=new SuperMap.Bounds(
                 minX, minY, maxX, maxY
@@ -209,7 +214,7 @@ SuperMap.Layer.Tianditu = SuperMap.Class(SuperMap.CanvasLayer, {
             //this.numZoomLevels = 18;
 
             this.units = "m";
-            this.projection = "EPSG:900913";
+            this.projection = new SuperMap.Projection("EPSG:900913");
 
             this.maxExtent=new SuperMap.Bounds(
                 minX, minY, maxX, maxY

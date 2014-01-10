@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="demo/css/demo2.css">
+    <script src="common/js/jquery.js"></script>
+    <script src="demo/js/bevInclude.js"></script><!--引入bev入口脚本-->
+    <script src="demo/libs/SuperMap.Include.js"></script><!--引入SuperMap iClient For JavaScript类库-->
+    <script src="demo/js/demo2.js"></script>
+    <style type="text/css">
+        #mapContainer {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            /*z-index: -5;*/
+        }
+    </style>
+    <script>
+        var map, layer0;
+        function init() {
+            {_logoImageUpload_}
+            {_logoTitle_}
+            {_themeSelect_}
+            initDemo();
+            window.center = new SuperMap.LonLat({_longitude_},{_latitude_});
+            window.zoom = {_zoomLevel_};
+            window.mapControlList = {_mapControls_};
+            {_mapServiceSelect_}
+
+            {_measureControl_}
+            {_geolocateControl_}
+            {_drawControl_}
+        }
+
+        function setLogoImg(paraStr){
+            if(paraStr){
+                var tp = paraStr.split(",");
+                var isSelect = tp[0];
+                var imgSrc = tp[1];
+
+                if(isSelect=="1"){
+                    $("#logoImg").css({
+                        "display":"inline"
+                    })
+                            .attr({
+                                "src":"demo/img/"+imgSrc
+                            });
+                }
+                else{
+                    $("#logoImg").css({
+                        "display":"none"
+                    });
+                }
+            }
+        }
+
+        function setLogoTitle(paraStr){
+            if(paraStr){
+                var tp = paraStr.split(",");
+                var isSelect = tp[0];
+                var text = tp[1];
+
+                $("#logoTitle").html(text).css({
+                    "display":(isSelect=="1")?"inline":"none"
+                });
+                document.title = text;
+            }
+        }
+    </script>
+
+
+</head>
+<body onload="init()" style="position: absolute;width: 100%;height: 100%;">
+<!--[if IE 7]><div style="position: absolute;width: 100%;height: 100%;overflow: hidden;"><![endif]-->
+<div id="head" class="background_1"><!--标题栏-->
+    <span id="logo" class="inline_block bev-logo"><img id="logoImg" style="display: none;height:56px;"/><span id="logoTitle"></span></span>
+</div>
+<div id="bev_bd">
+    <div id="bd_left" class="floatl"><!--地图左侧工具栏-->
+        <div id="left_back"></div>
+        <div class="bd_left_d0"><span id="left_menu" class="bdleft_d1 inline_block">test</span></div>
+    </div>
+    <div id="bd_right" class="">
+        <div id="bd_toolbar" class="bd_toolbar"><!--地图上边的一些工具按钮-->
+            <div id="toolbar_back"></div>
+        </div>
+        <div id="mapContainer" class="bd_map" style="border: 0px solid #000;"></div><!--地图区域-->
+    </div>
+</div>
+<!--[if IE 7]></div><![endif]-->
+</body>
+<script type="text/javascript">
+    (function(){//控制页面的自适应
+        window.resizeFunctions = [];
+        var a = function(){
+            var b = document.body;
+            var a = b.clientHeight;
+            var c = window.resizeFunctions;
+            for(var i=0;i< c.length;c++){
+                if(c[i]){
+                    try{c[i]();}catch(e){}
+                }
+            }
+            document.getElementById("bev_bd").style.height = (a - 65) + "px";
+        }
+        a();
+        if(window.addEventListener){
+            window.addEventListener("resize",a);
+        }
+        else{
+            window.attachEvent("onresize",a);
+        }
+    })();
+</script>
+</html>

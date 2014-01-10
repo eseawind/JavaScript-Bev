@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>扩展开发指南</title>
+    <link href='css/style.css' rel='stylesheet'/>
+</head>
+<body>
+   <div id="body">
+       <h1>SuperMap JavaScript Bev 扩展开发指南</h1>
+       <br>
+       <br>
+       <div id="content">
+           <h3>一、开发简介</h3>
+           
+		   <p>
+		       本产品除了提供简易的可视化应用搭建平台之外，还提供了对搭建之后的应用进行扩展开发的功能强大的样式丰富的相关控件。
+			   您可以从中选择适合您的控件，然后轻易地集成到您的应用里面，从而组建起一个功能齐全的地图应用。
+		   </p>
+		   <div class="images"><img src="images/indexHTML.png"/></div>
+           <br>
+           <h3>二、扩展之前</h3>
+           <div class="images"><img src=" "/></div>
+           <br>
+           <p>
+               在进行扩展之前，您可以根据我们提供的使用说明先创建一个基础的地图应用。创建了基础地图应用之后，您就可以对您所创建的基础地图
+			   应用进行扩展开发了。本文档是以利用《模板一》搭建出来的页面为基础进行扩展开发的简单开发指南。
+           </p>
+           <h3>三、扩展开发</h3>
+           <h5>1、生成页面代码解析</h5>
+           <p>
+              利用Bev搭建平台所生成页面位于bev的根目录，名为：“index.html”，我们可以利用文本编辑器打开，并进行编辑。 
+           </p>
+		   <br>
+		   <h6>(1)包含的JS文件</h6>
+		   <p>
+		      通过Bev搭建出来的页面都包含有下面这几个JS文件的引用：
+		   </p>
+		   <ul>
+		        <li>demo/libs/SuperMap.Include.js&nbsp;&nbsp;&nbsp;&nbsp;//iclient类库引用文件</li>
+			    <li>common/js/jquery-1.8.2.js&nbsp;&nbsp;&nbsp;&nbsp;//jquery类库引用文件</li>
+			    <li>demo/js/bevInclude.js&nbsp;&nbsp;&nbsp;&nbsp;//Bev类库引用文件</li>
+			    <li>demo/js/demo1.js&nbsp;&nbsp;&nbsp;&nbsp;//模板初始化文件（模板一为demo1.js，模板二为demo2.js...）</li>
+		   </ul>
+           <h6>(2)添加地图</h6>
+           <p>添加地图的代码为：createMap("1");&nbsp;其中参数代表的如下：</p>
+		   <ul>
+		       <li>"1"为SuperMap云服务地图</li>
+			   <li>"2"为SuperMap iServer Java服务地图</li>
+			   <li>"3"为Google地图</li>
+			   <li>"4"为OpenStreet Map</li>
+			   <li>"5"为天地图</li>
+			   <li>"6"为ArcGis Online地图</li>
+			   <li>"7"为百度地图</li>
+			   <li>"8"为Bing 地图</li>
+		   </ul>
+           <h6>(3)Bev控件</h6>
+           <p>我们所提供的控件主要包括导航条、窗口和要素绘制等等</p>
+           <p>假如您要添加一个导航条控件，代码如下：<br>
+		       myNav=new Bev.Navbar({   <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"body":$("#toolbar");   <br>
+               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});</p>
+           <p>其中参数中body对应的就是Navbar控件的parent</p>	
+           <p>添加一个控件后，您就可以往这个控件里面添加内容了：<br>
+		      myNav.addNavItem({  <br>
+                "icon_class":"tool-icon-20", <br>
+                "title":"基本操作" <br>
+            }); <br>
+             这里，我们给新添加的myNav控件加入了一个项，其显示文字为：“基本操作”			
+		   </p>		   
+           <h5>2、Bev控件简介</h5>
+           <p>
+             假如您打算对生成的页面进行扩展开发，那么，您可以在我们给您提供的控件中选择适合你的来加入到您的应用中。我们所提供的控件包括手风琴式菜单控件、
+             导航条、菜单、窗口、提示条、数据表、要素绘制、定位、面积长度量算、图标和窗口管理器等控件。<br>			 
+           </p>
+		   <h6>手风琴式菜单：</h6>
+           <div class="images"><img src="images/Accordion.png"/></div>
+		   <p>当点击控件的某个项时，控件会像手风琴一样展开其内容项</p>
+           <br>
+           <h6>导航条：</h6>
+           <div class="images"><img src="images/Navbar.png"/></div>
+		   <p>导航条的项可为菜单项或者按钮等等</p>
+           <br>
+		   <h6>下拉菜单：</h6>
+           <div class="images"><img src="images/Menu.png"/></div>
+		   <p>可在导航条的mouseover事件上绑定菜单的显示，并设置其位置，成为下拉菜单</p>
+           <br>
+		   <h6>对话框窗口：</h6>
+           <div class="images"><img src="images/Dialog.png"/></div>
+		   <p>对话框可以在打开的页面内任意地拖动，也可以挂载到窗口管理器上面</p>
+           <br>
+		   <h6>窗口管理器：</h6>
+           <div class="images"><img src="images/WidgetControl.png"/></div>
+		   <p>挂载多个窗口，控制窗口的显示及隐藏</p>
+           <br>
+		   <p>对于所有控件的详细介绍，请详见<a href="doc/index.html">SuperMap JavaScript Bev API文档</a></p>
+       </div>
+   </div>
+</body>
+</html>
