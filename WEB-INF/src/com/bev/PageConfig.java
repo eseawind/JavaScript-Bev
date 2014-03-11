@@ -74,7 +74,12 @@ public class PageConfig extends HttpServlet implements ServletContextListener {
         String result = null;
 
         if(id!=null&&value!=null){
-            this.modifyConfig(id,value);
+            String optionStr = request.getParameter("option");
+            JSONObject option = null;
+            if(optionStr!=null){
+                option = JSONObject.fromObject(optionStr);
+            }
+            this.modifyConfig(id,value,option);
             result = "succed";
         }
         else if(m!=null&&m.equals("createPage")){
@@ -103,8 +108,9 @@ public class PageConfig extends HttpServlet implements ServletContextListener {
              if(category.equals("选择模板")){
                   JSONArray contents = obj.getJSONArray("contents");
                   JSONObject contObj = contents.getJSONObject(0);
-                  JSONObject options = contObj.getJSONObject("options");
-                  templateName = options.getString("defaultValue");
+                  //JSONObject options = contObj.getJSONObject("options");
+                  //templateName = contObj.getString("defaultValue");
+                  templateName = ConfigInfo.getSelectValue(contObj);
                   break;
              }
         }
@@ -134,7 +140,6 @@ public class PageConfig extends HttpServlet implements ServletContextListener {
 
         templatePath = sce.getServletContext().getInitParameter("templatePath");
         templatePath = rootpath+templatePath;
-        //getTempLate(templatePath);
 
         demoPath = sce.getServletContext().getInitParameter("demopath");
         demoPath = rootpath+demoPath;
@@ -162,6 +167,15 @@ public class PageConfig extends HttpServlet implements ServletContextListener {
             String code = codeObj.getString("code");
             String defaultValue = codeObj.getString("defaultValue");
 
+            if(codeObj.has("options")){
+                JSONObject options = codeObj.getJSONObject("options");
+                String optionsStr = options.toString();
+                code = code.replaceAll("\\$options",optionsStr);
+            }
+            else{
+                code = code.replaceAll("\\$options","null");
+            }
+
             code = code.replaceAll("\\$key",defaultValue);
             template1 = template1.replaceAll("\\{_"+id1+"_\\}", code);
         }
@@ -173,8 +187,8 @@ public class PageConfig extends HttpServlet implements ServletContextListener {
          FileManger.writeTxt(this.demoPath,ConfigInfo.htmlStr);
     }
 
-    public void modifyConfig(String id,String value){
-        ConfigInfo.modifyConfig(id,value);
+    public void modifyConfig(String id,String value,JSONObject option){
+        ConfigInfo.modifyConfig(id,value,option);
         getTempLate();
         modiyDomeHtml();
         //ConfigInfo.resetJSCodeMap();

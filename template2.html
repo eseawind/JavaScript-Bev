@@ -27,12 +27,15 @@
             initDemo();
             window.center = new SuperMap.LonLat({_longitude_},{_latitude_});
             window.zoom = {_zoomLevel_};
-            window.mapControlList = {_mapControls_};
+            window.mapControlList = getMapControlList("{_mapControls_}",2);
+            window.overlayParams = {_overlayMapServerice_};
             {_mapServiceSelect_}
 
             {_measureControl_}
             {_geolocateControl_}
             {_drawControl_}
+            {_loadJSON_}
+            {_queryControl_}
         }
 
         function setLogoImg(paraStr){
@@ -81,7 +84,7 @@
 <div id="bev_bd">
     <div id="bd_left" class="floatl"><!--地图左侧工具栏-->
         <div id="left_back"></div>
-        <div class="bd_left_d0"><span id="left_menu" class="bdleft_d1 inline_block">test</span></div>
+        <div class="bd_left_d0"><span id="left_menu" class="bdleft_d1 inline_block"></span></div>
     </div>
     <div id="bd_right" class="">
         <div id="bd_toolbar" class="bd_toolbar"><!--地图上边的一些工具按钮-->

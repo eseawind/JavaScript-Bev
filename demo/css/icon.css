@@ -868,3 +868,19 @@
 .glyphicon-lock-down:before {
   content: "\e209";
 }
+
+.glyphicon-georss:before {
+    content: "\e210";
+}
+
+.glyphicon-kml:before {
+    content: "\e211";
+}
+
+.glyphicon-json:before {
+    content: "\e212";
+}
+
+.glyphicon-gml:before {
+    content: "\e213";
+}

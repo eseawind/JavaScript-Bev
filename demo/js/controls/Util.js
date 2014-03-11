@@ -2,7 +2,7 @@
  * Class: Bev.Util
  * Bev静态方法。
  */
-Bev.Util={};
+Bev.Util=Bev.Util||{};
 /**
  * APIMethod: getSize
  * 获取dom元素的像素大小

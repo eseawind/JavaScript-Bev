@@ -1,4 +1,4 @@
-﻿<%@ page language="java" import="java.util.*"%>
+﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page language="java" import="net.sf.json.JSONArray"%>
 <%@ page language="java" import="net.sf.json.JSONObject"%>
 <%@ page language="java" import="com.bev.ConfigInfo"%>

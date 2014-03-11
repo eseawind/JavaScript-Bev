@@ -1,63 +1,272 @@
-﻿function createMap(key){
-     if(key==1){//SuperMap云服务
-         createSuperMapCloud();
-     }
-     else if(key==2){//SuperMap iServer Java服务
-         createiServer();
-     }
-     else if(key==3){//Google地图
-         createGoogleMap();
-     }
-     else if(key==4){//OpenStreet Map
-         createOpenStreetMap();
-     }
-     else if(key==5){//天地图
-         createTiandituMap();
-     }
-     else if(key==6){//ArcGis Online
-         createArcGisMap();
-     }
-     else if(key==7){//百度地图
-         createBaiduMap();
-     }
-     else if(key==8){//Bing 地图
-         createBingMap();
-     }
-}
-function createSuperMapCloud(){
-    var map = new SuperMap.Map(
-        'mapContainer',
-        {
-            controls:window.mapControlList||[],
-            units: 'm',
-            projection: 'EPSG:3857',
-            allOverlays: true
-        }
-    );
-    var layer0 = new SuperMap.Layer.CloudLayer();
-    map.addLayer(layer0);
-    map.setCenter(window.center,window.zoom);
-    window.map = map;
-}
-function createiServer(){
-    var url = "http://support.supermap.com.cn:8090/iserver/services/map-china400/rest/maps/China";
-    var map = new SuperMap.Map(
-        'mapContainer',
-        {
-            controls:window.mapControlList||[],
-            units: 'm',
-            projection: 'EPSG:3857',
-            allOverlays: true
-        }
-    );
-    var layer0 = new SuperMap.Layer.TiledDynamicRESTLayer("China",url, {transparent: true, cacheEnabled: true, redirect: true}, {maxResolution:"auto"});
-    layer0.events.on({"layerInitialized": addLayer});
+﻿function createMap(key,options){
 
-    function addLayer(){
-        map.addLayer(layer0);
-        map.setCenter(window.center,window.zoom);
+    getLayerFromOption(key,options,function(a){
+        var layers = a.layer;
+        if(!layers.length){
+            layers = [layers];
+        }
+
+        getOverLay(function(overlays){
+             layers = layers.concat(overlays);
+             var projection = a.projection;
+
+             newMap(projection,layers);
+        });
+    });
+
+    function newMap(projection,layers){
+        var option =  {
+            controls:window.mapControlList||[],
+            units: 'm',
+            allOverlays: true
+        };
+        if(projection){
+            option.projection = projection;
+        }
+        var map = new SuperMap.Map('mapContainer',option);
+        map.addLayers(layers);
+        var center = window.center;
+        map.setCenter(center,window.zoom);
+
+        var maxExtent = map.getMaxExtent();
+        if(!maxExtent.contains(center.lon,center.lat)){
+            map.zoomToMaxExtent();
+        }
+
+        window.map = map;
     }
-    window.map = map;
+
+    function getOverLay(callback){
+        var option = window.overlayParams;
+
+        if(option.length){
+            for(var i=0;i<option.length;i++){
+                var layerOption = option[i];
+
+                var type = layerOption.type;
+                var overlays = [];
+                var count = 0;
+                getLayerFromOption(type,layerOption,function(a){
+                    var layers = a.layer;
+                    if(!layers.length){
+                        layers = [layers];
+                    }
+                    overlays = overlays.concat(layers);
+                    count++;
+
+                    if(count==option.length){
+                        callback&&callback(overlays);
+                    }
+                });
+            }
+        }
+        else{
+            callback&&callback([]);
+        }
+    }
+
+    function getLayerFromOption(key,options,callback){
+        var layers;
+        if(key=="supermapCloud"){//SuperMap云服务
+            //createSuperMapCloud();
+            var a = getSuperMapCloud();
+            callback&&callback(a);
+        }
+        else if(key=="iserver"){//SuperMap iServer Java服务
+            getIserverLayer(function(callback){
+                return function(a){
+                    callback&&callback(a);
+                }
+            }(callback),options);
+        }
+        else if(key=="google"){//Google地图
+            //createGoogleMap();
+        }
+        else if(key=="osm"){//OpenStreet Map
+            getOSMLayer(function(callback){
+                return function(a){
+                    callback&&callback(a);
+                }
+            }(callback));
+        }
+        else if(key=="tianditu"){//天地图
+            getTiandituLayer(function(callback){
+                return function(a){
+                    callback&&callback(a);
+                }
+            }(callback));
+        }
+        else if(key=="arcgis"){//ArcGis Online
+            getArcGisLayer(function(callback){
+                return function(a){
+                    callback&&callback(a);
+                }
+            }(callback));
+        }
+        else if(key=="baidu"){//百度地图
+            getBaiduLayer(function(callback){
+                return function(a){
+                    callback&&callback(a);
+                }
+            }(callback));
+        }
+        else if(key=="bing"){//Bing 地图
+            getBingLayer(function(callback){
+                return function(a){
+                    callback&&callback(a);
+                }
+            }(callback));
+        }
+        else if(key=="wmts"){//WMTS图层
+            var a = getWMTSLayer(options);
+            callback&&callback(a);
+        }
+    }
+
+     function getSuperMapCloud(){
+         var projection = "EPSG:3857";
+         var layer = new SuperMap.Layer.CloudLayer();
+
+         return {
+             "projection":projection,
+             "layer":layer
+         };
+     }
+
+     function getIserverLayer(callback,option){
+         var url = option.url;
+         var layerName = option.layerName;
+         var layer = new SuperMap.Layer.TiledDynamicRESTLayer(layerName,url, {transparent: true, cacheEnabled: true, redirect: true}, {maxResolution:"auto"});
+         layer.events.on({"layerInitialized": function(callback,layer){
+             return function(){
+                 callback&&callback({
+                     "layer":layer
+                 });
+             }
+         }(callback,layer)});
+     }
+
+    function getOSMLayer(callback){
+            LazyLoad.js([
+                "demo/libs/layer/OSM.js"
+            ],function(callback){
+                return function(){
+                    var layer0 = new SuperMap.Layer.OSM("osmLayer");
+                    callback&&callback({
+                        "layer":layer0,
+                        "projection":"EPSG:3857"
+                    });
+                }
+            }(callback));
+    }
+
+    function getTiandituLayer(callback){
+        LazyLoad.js("demo/libs/layer/Tianditu.js",function(callback){
+            return function(){
+                var layer1 = new SuperMap.Layer.Tianditu({"layerType":"vec"});//img,ter
+                var layer2 = new SuperMap.Layer.Tianditu({"layerType":"vec","isLabel":true});
+
+                callback&&callback({
+                    "layer":[layer1,layer2],
+                    "projection":"EPSG:3857"
+                });
+            }
+        }(callback));
+    }
+
+    function getArcGisLayer(callback){
+        LazyLoad.js("demo/libs/layer/ArcGIS93Rest.js",function(callback){
+            return function(){
+                var projection = "EPSG:3857";
+                var url = "http://www.arcgisonline.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/export";
+                var layer0 = new SuperMap.Layer.ArcGIS93Rest("ArcGIS93Rest", url, {layers:"show:0,1,2,4"}, {projection:projection});
+
+                callback&&callback({
+                    "layer":layer0,
+                    "projection":projection
+                });
+            }
+        }(callback));
+    }
+
+    function getBaiduLayer(callback){
+        LazyLoad.js("demo/libs/layer/Baidu.js",function(callback){
+            return function(){
+                var layer0 = new SuperMap.Layer.Baidu();
+
+                callback&&callback({
+                    "layer":layer0
+                });
+            }
+        }(callback));
+    }
+
+    function getBingLayer(callback){
+        LazyLoad.js("demo/libs/layer/Bing.js",function(callback){
+            return function(){
+                var apiKey = "AqTGBsziZHIJYYxgivLBf0hVdrAk9mWO5cQcb8Yux8sW5M8c8opEC2lZqKR1ZZXf";
+                var projection = "EPSG:3857";
+                var road = new SuperMap.Layer.Bing({
+                    name: "Road",
+                    key: apiKey,
+                    type: "Road"
+                });
+                var hybrid = new SuperMap.Layer.Bing({
+                    name: "Hybrid",
+                    key: apiKey,
+                    type: "AerialWithLabels"
+                });
+                var aerial = new SuperMap.Layer.Bing({
+                    name: "Aerial",
+                    key: apiKey,
+                    type: "Aerial"
+                });
+
+                callback&&callback({
+                    "layer":[road,hybrid,aerial],
+                    "projection":projection
+                });
+            }
+        }(callback));
+    }
+
+    function getWMTSLayer(option){
+        var url = "",wmtsLayerName="",wmtsMatrixSet="",wmtsFormat="",resolutions=[],requestEncoding="",layer;
+        if(option){
+            url = option.url;
+            layer = option.layer;
+            wmtsLayerName=option.wmtsLayerName;
+            wmtsMatrixSet=option.wmtsMatrixSet;
+            wmtsFormat=option.wmtsFormat;
+            var resolutionStr = option.resolution;
+            var resolutionStrs=resolutionStr.split(",");
+            resolutions=[];
+            for(var i=0;i<resolutionStrs.length;i++){
+                resolutions.push(parseFloat(resolutionStrs[i]));
+            }
+            requestEncoding=option.requestEncoding;
+        }
+        else{
+            return;
+        }
+
+        //新建图层
+        var layer0 = new SuperMap.Layer.WMTS({name:wmtsLayerName,
+            url: url,
+            layer: layer,
+            style: "default",
+            matrixSet: wmtsMatrixSet,
+            format: wmtsFormat,
+            resolutions:resolutions,
+            //matrixIds:matrixIds,
+            opacity: 1,
+            requestEncoding:requestEncoding
+        });
+
+        return {
+            "layer":layer0
+        }
+    }
 }
 function createGoogleMap(){
     LazyLoad.js([
@@ -91,111 +300,6 @@ function createGoogleMap(){
 
         map.addLayers([gphy, gmap, ghyb, gsat]);
         //设置地图中心点，显示地图
-        map.setCenter(window.center,window.zoom);
-        window.map = map;
-    });
-}
-function createOpenStreetMap(){
-    LazyLoad.js([
-        "demo/libs/layer/OSM.js"
-    ],function(){
-        var map = new SuperMap.Map(
-            'mapContainer',
-            {
-                controls:window.mapControlList||[],
-                units: 'm',
-                projection: 'EPSG:3857',
-                allOverlays: true
-            }
-        );
-        var layer0 = new SuperMap.Layer.OSM("osmLayer");
-        map.addLayer(layer0);
-        map.setCenter(window.center,window.zoom);
-        window.map = map;
-    });
-}
-function createTiandituMap(){
-    LazyLoad.js("demo/libs/layer/Tianditu.js",function(){
-        var map = new SuperMap.Map(
-            'mapContainer',
-            {
-                controls:window.mapControlList||[],
-                units: 'm',
-                projection: 'EPSG:3857',
-                allOverlays: true
-            }
-        );
-
-        var layer1 = new SuperMap.Layer.Tianditu({"layerType":"vec"});//img,ter
-        var layer2 = new SuperMap.Layer.Tianditu({"layerType":"vec","isLabel":true});
-
-        map.addLayers([layer1,layer2]);
-        map.setCenter(window.center,window.zoom);
-        window.map = map;
-    });
-}
-function createArcGisMap(){
-    LazyLoad.js("demo/libs/layer/ArcGIS93Rest.js",function(){
-        var url = "http://www.arcgisonline.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/export";
-        var map = new SuperMap.Map(
-            'mapContainer',
-            {
-                controls:window.mapControlList||[],
-                units: 'm',
-                projection: 'EPSG:3857',
-                allOverlays: true
-            }
-        );
-        var layer0 = new SuperMap.Layer.ArcGIS93Rest("World", url, {layers:"show:0,1,2,4"}, {projection:"EPSG:3857",useCanvas:true});
-        map.addLayer(layer0);
-        map.setCenter(window.center,window.zoom);
-        window.map = map;
-    });
-}
-function createBaiduMap(){
-    LazyLoad.js("demo/libs/layer/Baidu.js",function(){
-        var map = new SuperMap.Map(
-            'mapContainer',
-            {
-                controls:window.mapControlList||[],
-                units: 'm',
-                allOverlays: true
-            }
-        );
-        var layer0 = new SuperMap.Layer.Baidu();
-        map.addLayer(layer0);
-        map.setCenter(window.center,window.zoom);
-        window.map = map;
-    });
-}
-function createBingMap(){
-    LazyLoad.js("demo/libs/layer/Bing.js",function(){
-        var apiKey = "AqTGBsziZHIJYYxgivLBf0hVdrAk9mWO5cQcb8Yux8sW5M8c8opEC2lZqKR1ZZXf";
-        var map = new SuperMap.Map(
-            'mapContainer',
-            {
-                controls:window.mapControlList||[],
-                units: 'm',
-                projection: 'EPSG:3857',
-                allOverlays: true
-            }
-        );
-        var road = new SuperMap.Layer.Bing({
-            name: "Road",
-            key: apiKey,
-            type: "Road"
-        });
-        var hybrid = new SuperMap.Layer.Bing({
-            name: "Hybrid",
-            key: apiKey,
-            type: "AerialWithLabels"
-        });
-        var aerial = new SuperMap.Layer.Bing({
-            name: "Aerial",
-            key: apiKey,
-            type: "Aerial"
-        });
-        map.addLayers([road, hybrid, aerial]);
         map.setCenter(window.center,window.zoom);
         window.map = map;
     });

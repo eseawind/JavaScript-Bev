@@ -52,6 +52,20 @@ Bev.Dialog = Bev.Class({
 
     isDialog:false,
 
+    autoOpen:true,
+
+    height:undefined,
+
+    width:undefined,
+
+    modal:false,
+
+    buttons:null,
+
+    close:null,
+
+    title:null,
+
     /**
      * Constructor: Bev.Dialog
      * 实例化 Dialog 类。
@@ -69,10 +83,19 @@ Bev.Dialog = Bev.Class({
      * });
      * (end)
      */
-    initialize: function(content, head,isHide) {
+    initialize: function(content, head,isHide,params) {
         this.content = content;
         this.head = head;
         this.isHide = !!isHide;
+        if(params){
+            this.autoOpen=params["autoOpen"]||true;
+            this.height=params["height"]||undefined;
+            this.width=params["width"]||undefined;
+            this.modal=params["modal"]||false;
+            this.buttons=params["buttons"]||null;
+            this.close=params["close"]||null;
+            this.title=params["title"]||head.text||null;
+        }
         this.create();
     },
 
@@ -84,6 +107,7 @@ Bev.Dialog = Bev.Class({
         var body, content,t = this;
 
         this.body = body = $("<div title=\""+t.head.text+"\" class=\"dialog\"></div>")
+            .css("display","none")
             .appendTo($("body"));
         this.content_body = content = $("<div class=\"jsBev_sample\"></div>");
         content.appendTo(body);
@@ -91,8 +115,17 @@ Bev.Dialog = Bev.Class({
 
         this.loadFiles(function(){
             var body = t.body;
+            t.body.css("display","block");
             if(!t.isDialog){
-                body.dialog();
+                body.dialog({
+                    title: t.title,
+                    autoOpen: t.autoOpen,
+                    height: t.height,
+                    width: t.width,
+                    modal: t.modal,
+                    buttons: t.buttons,
+                    close: t.close
+                });
                 if(t.isHide)body.dialog("hide");
                 t.isDialog = true;
             }
@@ -109,6 +142,7 @@ Bev.Dialog = Bev.Class({
     getContentBody:function () {
         return this.content_body;
     },
+
 
     /**
      * APIMethod: show
@@ -136,6 +170,18 @@ Bev.Dialog = Bev.Class({
                 t.isHide = true;
             }
         })
+    },
+
+    /**
+     * APIMethod: destroy
+     * 销毁dialog
+     */
+    destroy:function(){
+        this.body.dialog("destroy");
+        this.body.remove();
+        for(var key in this){
+             this[key] = null;
+        }
     },
 
     /**
@@ -176,6 +222,7 @@ Bev.Dialog = Bev.Class({
                 "demo/js/ui/jquery.ui.mouse.js",
                 "demo/js/ui/jquery.ui.draggable.js",
                 "demo/js/ui/jquery.ui.bevbutton.js",
+                "demo/js/ui/jquery.ui.button.js",
                 "demo/js/ui/jquery.ui.dialog.js"
             ],function(){
                 t.isFilesLoaded = true;

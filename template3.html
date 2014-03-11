@@ -27,12 +27,18 @@
             initDemo();
             window.center = new SuperMap.LonLat({_longitude_},{_latitude_});
             window.zoom = {_zoomLevel_};
-            window.mapControlList = {_mapControls_};
+            window.mapControlList = getMapControlList("{_mapControls_}",3);
+            window.overlayParams = {_overlayMapServerice_};
             {_mapServiceSelect_}
 
             {_measureControl_}
             {_geolocateControl_}
             {_drawControl_}
+            {_loadJSON_}
+            {_queryControl_}
+
+            bindMenu2Nav(nav,baseToolsMenu,"tool-icon-20","基本操作");
+            bindMenu2Nav(nav,restMenu,"tool-icon-20","REST服务");
         }
 
         function setLogoImg(paraStr){

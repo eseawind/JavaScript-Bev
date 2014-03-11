@@ -40,7 +40,16 @@ LazyLoad=(function(doc){var env,head,pending={},pollCount=0,queue={css:[],js:[]}
 
 window.Bev = {};
 Bev.loader = LazyLoad;
-Bev.loader.js("demo/js/Class.js");
-Bev.loader.js("demo/js/controls/Accordion.js");
-Bev.loader.js("config/js/FileUpload.js");
-Bev.loader.js("config/js/ConfigTool.js");
+Bev.inputScript = function(inc){
+    var script = '<' + 'script type="text/javascript" src="' + inc + '"' + '><' + '/script>';
+    document.writeln(script);
+};
+Bev.inputScript("demo/js/Class.js");
+Bev.inputScript("demo/js/controls/Accordion.js");
+Bev.inputScript("config/js/FileUpload.js");
+Bev.inputScript("demo/js/ui/jquery.ui.core.js");
+Bev.inputScript("demo/js/ui/jquery.ui.widget.js");
+Bev.inputScript("demo/js/ui/jquery.ui.bevbutton.js");
+Bev.inputScript("demo/js/controls/Dialog.js");
+Bev.inputScript("config/js/ConfigTool.js");
+Bev.loader.css("demo/css/icon.css");

@@ -29,21 +29,19 @@ Bev.Menu = Bev.Class({
      *  ]
      * (end)
      */
-    tree:[
-
-    ],
+    tree:null,
 
     /**
      * APIProperty: menuBody
      * {HTMLElement} 内容区域
      */
     menuBody:null,
-    itemArray:[],
+    itemArray:null,
     /**
      * Property: _events
      * {Array} items的事件列表
      */
-    _events:[],
+    _events:null,
 
     /**
      * APIProperty: visible
@@ -85,6 +83,10 @@ Bev.Menu = Bev.Class({
      * (end)
      */
     initialize: function(options) {
+        this.tree = [];
+        this.itemArray = [];
+        this._events = [];
+
         for(var key in options){
             this[key] = options[key];
         }

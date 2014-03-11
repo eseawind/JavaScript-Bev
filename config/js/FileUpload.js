@@ -34,6 +34,8 @@ Bev.FileUpload = Bev.Class({
      */
     clickSubmit:function(){},
 
+    submitbtText:"提交",
+
     _iframe:null,
 
     _form:null,
@@ -68,7 +70,7 @@ Bev.FileUpload = Bev.Class({
                 "method":"post",
                 "enctype":"multipart/form-data",
                 "target":frameName,
-                "action":"fileupload?name="+(t.fileName||"test")
+                "action":"fileupload?name="+(t.fileName||"test.txt")
             });
 
         if(this.title){
@@ -88,6 +90,9 @@ Bev.FileUpload = Bev.Class({
             .css({
                 "width":"150px"
             })
+            .change(function(){
+                t.setFileName(this.value);
+            })
             .appendTo(dv);
 
         var dv = $("<div>")
@@ -96,7 +101,7 @@ Bev.FileUpload = Bev.Class({
             .attr({
                 "type":"submit",
                 "name":"submit",
-                "value":"提交"
+                "value": t.submitbtText
             })
             .click(this.clickSubmit)
             .appendTo(dv);
@@ -118,9 +123,7 @@ Bev.FileUpload = Bev.Class({
     bindEvent:function(){
         var t = this;
         this._iframe.unbind();
-        this._iframe.bind("load",function(){
-            t.onUpload();
-        });
+        this._iframe.bind("load", t.onUpload);
 //        function eventPush(obj, event, handler) {
 //            if (obj.addEventListener) {
 //                obj.addEventListener(event, handler, false);
@@ -136,7 +139,7 @@ Bev.FileUpload = Bev.Class({
 
     setFileName:function(fileName){
         this.fileName = fileName;
-        this._form.attr({
+        this._form&&this._form.attr({
             "action":"fileupload?name="+this.fileName
         });
     },

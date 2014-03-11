@@ -78,21 +78,25 @@ Bev.Select = Bev.Class({
             .appendTo(div);
 
         for(var i=0;i<txtArr.length;i++){
-            var curValue = txtArr[i].value||txtArr[i];
-            if(curValue==this.defaultValue){
+           // var curValue = txtArr[i].value||txtArr[i];
+            if((i+"")==this.defaultValue){
                 o1 = $("<option>")
                     .html(txtArr[i].name||txtArr[i])
                     .attr({
-                        "value":curValue,
+                        "value":i,
                         //"disabled":true,
                         "selected":true
+                        //"_index":i
                     })
                     .appendTo(s1);
             }
             else{
                 o1 = $("<option>")
                     .html(txtArr[i].name||txtArr[i])
-                    .attr("value",curValue)
+                    .attr({
+                        "value":i
+                        //"_index":i
+                    })
                     .appendTo(s1);
             }
         }

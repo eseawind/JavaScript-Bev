@@ -201,6 +201,7 @@ Bev.Navbar=Bev.Class({
 
     /**
      * APIMethod: bindEvent
+     * 给导航条绑定事件
      *
      * Parameters:
      * index - {Number} 要绑定事件的项的索引

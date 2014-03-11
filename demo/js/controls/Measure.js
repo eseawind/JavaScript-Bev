@@ -69,7 +69,7 @@ Bev.Measure = Bev.Class({
         var d1, d2, d3, me = this;
         if(this.body){
             this.body = $(this.body);
-            this.resultDiv = d1 = $("<p class='measureResult'></p>").appendTo(this.body);
+            this.resultDiv = d1 = $("<p class='measureResult bv-textarea'></p>").appendTo(this.body);
 
             d2 = $("<button>长度量算</button>").click(function () {
                 me.measureDistance();
